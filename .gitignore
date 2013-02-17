@@ -1,0 +1,19 @@
+# OS X folder attributes
+.DS_Store
+
+# Temporary files
+*~.nib
+*.swp
+*.pyc
+*~
+
+# Xcode project settings
+*.xcodeproj/
+!*.xcodeproj/*.pbxproj
+
+# Xcode workspace settings
+*.xcworkspace
+xcuserdata/
+
+# Xcode build products
+build/
