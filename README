@@ -30,7 +30,7 @@ Callbacks must be of the above signature (though names can vary).  If the
 callback is an instance method, an additional 'self' argument should be
 prepended to the argument list, and the method passed as self.method_name.
 
-Currently this fork only support Python 2.7.  There are also several
+Currently this fork only supports Python 2.7.  There are also several
 features missing, including:
 
     * redirects
