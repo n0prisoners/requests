@@ -1,0 +1,49 @@
+requests
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+This is a poor man's fork of Kenneth Reitz's Requests.
+
+The original API has been maintained, but callbacks for asynchronous calls
+have been added, as well as support for Google App Engine.  Several features
+have been cut for the time being.  This fork should be considered
+EXPERIMENTAL until those features have been reincorporated, and the fork
+declared STABLE.
+
+Typical use has not changed:
+
+    >>> r = requests.get('https://github.com')
+    >>> print r.status_code
+    200
+
+However, a callback can be specified, which will return an RPC object
+instead of a response:
+
+    >>> def callback(response, error):
+    >>>     print response
+    >>>     print error
+    >>> r = requests.get('https://github.com', callback=callback)
+    >>> r.wait()
+    <html>...</html>
+    None
+
+Callbacks must be of the above signature (though names can vary).  If the
+callback is an instance method, an additional 'self' argument should be
+prepended to the argument list, and the method passed as self.method_name.
+
+Currently this fork only support Python 2.7.  There are also several
+features missing, including:
+
+    * redirects
+    * sessions
+    * cookies
+    * multipart file uploads
+    * authentication
+    * connection pooling
+
+In its current state, this fork is only suitable for communication with
+RESTful APIs, which was its original purpose.  It is suitable for use with
+regular Python platforms as well as Google App Engine.
+
+For now, contributions aren't expected until the fork stabilises.
+
+  -- Paul Malyschko (paulm@n0prisoners.com)
