@@ -35,7 +35,6 @@ features missing, including:
 
     * redirects
     * sessions
-    * cookies
     * multipart file uploads
     * authentication
     * connection pooling
