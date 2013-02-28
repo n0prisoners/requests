@@ -3,7 +3,7 @@ Poor man's fork of Requests at <http://www.python-requests.org>
 
 """
 __title__ = 'requests'
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 __build__ = 0x010100
 __author__ = 'Kenneth Reitz, Paul Malyschko'
 __licence__ = 'Apache 2.0'
@@ -486,7 +486,10 @@ def extract_cookies_to_jar(jar, request, response):
     
     # pull out the HTTPMessage with the headers and put it in the mock:
     if PLATFORM['implementation'] != 'Google App Engine':
-        res = MockResponse(response.fp._sock.msg)
+        try:
+            res = MockResponse(response.fp._sock.msg)       # response
+        except AttributeError:
+            res = MockResponse(response.fp.fp._sock.msg)    # HTTP error
     else:
         res = MockResponse(response.header_msg)
     jar.extract_cookies(res, req)
@@ -1092,7 +1095,8 @@ class DefaultConnection(BaseConnection):
                 else:
                     e = RequestException(error.reason)
             elif hasattr(error, 'code'):
-                self.raise_for_status()
+                r = self.build_response(request, error)
+                r.raise_for_status()
         except AttributeError:
             e = SSLError("SSL not supported on this platform")
         except Exception as error:
@@ -1117,10 +1121,7 @@ class DefaultConnection(BaseConnection):
             if request.method == 'POST' or request.method == 'PUT':
                 data = request.data
             elif request.method == 'GET':
-                request.url = ''.join([
-                    request.url,
-                    '?',
-                    urllib.urlencode(request.data)])
+                request.url = ''.join([request.url, '?', request.data])
         
         handler = self.build_handler(request.url, verify)
         opener = urllib2.build_opener(handler)
@@ -1210,10 +1211,11 @@ class AppEngineConnection(BaseConnection):
         url = prepend_scheme_if_needed(request.url, 'http')
         data = None
         
-        if request.method == 'POST' or 'PUT':
-            data = request.data
-        elif request.method == 'GET':
-            url = ''.join([url, '?', urllib.urlencode(request.data)])
+        if request.data:
+            if request.method == 'POST' or 'PUT':
+                data = request.data
+            elif request.method == 'GET':
+                url = ''.join([url, '?', request.data])
         
         if callback:
             self.rpc = urlfetch.create_rpc()
